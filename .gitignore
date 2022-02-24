@@ -1,0 +1,7 @@
+# Folders
+.idea
+.vagrant
+
+# Files
+*.log
+*.vdi
