@@ -1,0 +1,56 @@
+# ==================================== #
+# [EX294 Lab] - Parameters to override #
+# ==================================== #
+
+parameters:
+  vms: 6          # total VMs -> 5
+  numcpus: 1
+  memory: 1024
+  image: rhel8
+  password: devops
+
+
+# ===================================== #
+# [EX294 Lab] - Ansible Controller node #
+# ===================================== #
+
+ansible-control.rhcx.local:
+  memory: 2048
+  image: {{ image }}
+  numcpus: {{ numcpus }}
+  reservedns: true
+  files:
+    - path: /etc/motd
+      content: |
+        # *************************************** #
+        #     Welcome to the RHCx Training Box    #
+        # *************************************** #
+  scripts:
+    - hacks/set_ssh_keys.sh
+
+
+# =================================== #
+# [EX294 Lab] - Ansible Managed hosts #
+# =================================== #
+
+{% for i in range(2, vms) %}
+ansible{{ i }}.rhcx.local:
+  image: {{ image }}
+  memory: {{ memory }}
+  numcpus: {{ numcpus }}
+  reservedns: true
+  disks:
+    - size: 20
+    - size: 5
+  cmds:
+    - echo {{ password }} | sudo passwd --stdin root
+  files:
+    - path: /etc/motd
+      content: |
+        # *************************************** #
+        #     Welcome to the RHCx Training Box    #
+        # *************************************** #
+{% endfor %}
+
+
+# This sample lab is heavily inspired on this blog post: https://www.lisenet.com/2019/ansible-sample-exam-for-ex294/.
